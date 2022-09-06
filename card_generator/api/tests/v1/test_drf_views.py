@@ -1,6 +1,6 @@
 from django.test import RequestFactory
 
-from card_generator.users.api.views import UserViewSet
+from card_generator.api.v1.users.views import UserViewSet
 from card_generator.users.models import User
 
 
@@ -26,5 +26,5 @@ class TestUserViewSet:
         assert response.data == {
             "username": user.username,
             "name": user.name,
-            "url": f"http://testserver/api/users/{user.username}/",
+            "url": f"http://testserver/api/v1/users/{user.username}/",
         }

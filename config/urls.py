@@ -23,10 +23,12 @@ urlpatterns = [
 # API URLS
 urlpatterns += [
     # API base url
-    path("api/", include("config.api_router")),
+    path("api/", include("card_generator.api.urls")),
     # DRF auth token
     path("auth-token/", obtain_auth_token),
-    path("api/schema/", SpectacularAPIView.as_view(), name="api-schema"),
+    path(
+        "api/schema/", SpectacularAPIView.as_view(api_version="v1"), name="api-schema"
+    ),
     path(
         "api/docs/",
         SpectacularSwaggerView.as_view(url_name="api-schema"),
