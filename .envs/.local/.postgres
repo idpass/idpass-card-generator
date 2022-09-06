@@ -1,0 +1,7 @@
+# PostgreSQL
+# ------------------------------------------------------------------------------
+POSTGRES_HOST=postgres
+POSTGRES_PORT=5432
+POSTGRES_DB=open_card_generator
+POSTGRES_USER=SaJRFxFCRYpIIEPVwntQIJhPQjRORHHQ
+POSTGRES_PASSWORD=u9YPMLYspU8esxKBNaSzekZHPfTuKJqBIABoeodISjLreidj9bF8sEm80QLR4afQ
