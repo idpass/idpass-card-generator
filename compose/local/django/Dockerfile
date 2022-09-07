@@ -1,57 +1,26 @@
-ARG PYTHON_VERSION=3.9-slim-bullseye
-
-# define an alias for the specfic python version used in this file.
-FROM python:${PYTHON_VERSION} as python
-
-# Python build stage
-FROM python as python-build-stage
-
-ARG BUILD_ENVIRONMENT=local
-
-# Install apt packages
-RUN apt-get update && apt-get install --no-install-recommends -y \
-  # dependencies for building Python packages
-  build-essential \
-  # psycopg2 dependencies
-  libpq-dev
-
-# Requirements are installed here to ensure they will be cached.
-COPY ./requirements .
-
-# Create Python Dependency and Sub-Dependency Wheels.
-RUN pip wheel --wheel-dir /usr/src/app/wheels  \
-  -r ${BUILD_ENVIRONMENT}.txt
-
-
-# Python 'run' stage
-FROM python as python-run-stage
-
-ARG BUILD_ENVIRONMENT=local
-ARG APP_HOME=/app
+FROM python:3.10-slim-buster
 
 ENV PYTHONUNBUFFERED 1
 ENV PYTHONDONTWRITEBYTECODE 1
-ENV BUILD_ENV ${BUILD_ENVIRONMENT}
 
-WORKDIR ${APP_HOME}
-
-# Install required system dependencies
-RUN apt-get update && apt-get install --no-install-recommends -y \
+RUN apt-get update \
+  # install fonts available in apt
+  && apt-get install -y fonts-roboto fonts-noto fonts-ocr-b \
+  # dependencies for building Python packages
+  && apt-get install -y build-essential \
   # psycopg2 dependencies
-  libpq-dev \
+  && apt-get install -y libpq-dev \
   # Translations dependencies
-  gettext \
+  && apt-get install -y gettext \
+  # Pdf generation
+  && apt-get install -y libxml2-dev libxslt-dev librsvg2-bin mupdf-tools \
   # cleaning up unused files
   && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
   && rm -rf /var/lib/apt/lists/*
 
-# All absolute dir copies ignore workdir instruction. All relative dir copies are wrt to the workdir instruction
-# copy python dependency wheels from python-build-stage
-COPY --from=python-build-stage /usr/src/app/wheels  /wheels/
-
-# use wheels to install python dependencies
-RUN pip install --no-cache-dir --no-index --find-links=/wheels/ /wheels/* \
-	&& rm -rf /wheels/
+# Requirements are installed here to ensure they will be cached.
+COPY ./requirements /requirements
+RUN pip install -r /requirements/local.txt
 
 COPY ./compose/production/django/entrypoint /entrypoint
 RUN sed -i 's/\r$//g' /entrypoint
@@ -61,9 +30,10 @@ COPY ./compose/local/django/start /start
 RUN sed -i 's/\r$//g' /start
 RUN chmod +x /start
 
+COPY ./card_generator/static/fonts/* /usr/share/fonts/
+RUN fc-cache -f -v
 
-
-# copy application code to WORKDIR
-COPY . ${APP_HOME}
+COPY . /app
+WORKDIR /app
 
 ENTRYPOINT ["/entrypoint"]
