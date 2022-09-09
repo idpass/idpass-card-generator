@@ -3,7 +3,7 @@ from collections import OrderedDict
 
 from django.core.validators import FileExtensionValidator
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from model_utils.models import TimeStampedModel
 
 from card_generator.cards.utils import get_svg_fields_from_tags, get_svg_variables
