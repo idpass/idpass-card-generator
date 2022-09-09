@@ -14,4 +14,3 @@ class CardFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = Card
-

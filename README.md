@@ -24,7 +24,7 @@ Moved to [settings](http://cookiecutter-django.readthedocs.io/en/latest/settings
   - Get your access token in `api/v1/auth-token`
 
 ## Using the CARD API
-This is the first version of the api, refer to this [documentation on its usage](card_generator/api/v1/cards/README.md). 
+This is the first version of the api, refer to this [documentation on its usage](card_generator/api/v1/cards/README.md).
 For the API specification, run the django application and visit [OPENAPI documentation](http://localhost:8000/api/docs).
 
 ## Basic Commands

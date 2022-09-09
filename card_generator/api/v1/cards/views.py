@@ -1,11 +1,11 @@
 from drf_spectacular.utils import extend_schema
-
-from card_generator.api.v1.cards.serializers import CardSerializer, CardRenderSerializer
-from card_generator.cards.models import Card
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
+
+from card_generator.api.v1.cards.serializers import CardRenderSerializer, CardSerializer
+from card_generator.cards.models import Card
 
 
 @extend_schema(tags=["cards"])

@@ -293,18 +293,6 @@ class CardDetailTestCase(APITestCase):
 
     def test_anonymous_user_card_fields(self):
         self.client.logout()
-        fields = [
-            {"tag": "image", "name": "profile_svg_3"},
-            {"tag": "text", "name": "sex"},
-            {"tag": "text", "name": "date_of_birth"},
-            {"tag": "text", "name": "date_of_expiry"},
-            {"tag": "text", "name": "identification_no"},
-            {"tag": "text", "name": "date_of_issue"},
-            {"tag": "text", "name": "given_name"},
-            {"tag": "text", "name": "nationality"},
-            {"tag": "text", "name": "surname"},
-            {"tag": "image", "name": "qrcode_svg_15"},
-        ]
         response = self.client.get(self.fields_url)
 
         self.assertEqual(status.HTTP_401_UNAUTHORIZED, response.status_code)

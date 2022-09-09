@@ -1,7 +1,7 @@
 # Card Endpoints (v1)
 
 
-## Upload card templates 
+## Upload card templates
 _[api/v1/cards/](http://localhost:8000/api/v1/cards/)_
 
 In this example, we are using the existing templates in our test directory. Before you create a custom template, please check [Preparing the templates](#Preparing-the-templates) section.
@@ -147,7 +147,7 @@ Authorization: Token <auth_token>
 }
 ```
  Response looks like this
- 
+
 ```http response
 {
   "files": {
@@ -177,7 +177,7 @@ The system finds all the variables in the template to provide you a list of fiel
 <text id="svg_5">{{ identification_no }}</text>
 ```
 ```
-Field endpoint response 
+Field endpoint response
 {
     "name": "identification_no",
     "tag": "text"
@@ -197,7 +197,7 @@ Sample render value
 <image data-variable="profile_svg_3" xlink:href="data:image/svg+xml; charset=utf8, <base64 string>"/>
 ```
 ```
-Field endpoint response 
+Field endpoint response
 {
     "name": "profile_svg_3",
     "tag": "image"
