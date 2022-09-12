@@ -7,7 +7,7 @@ from jinja2 import Environment, meta
 
 
 def get_svg_fields_from_tags(svg_path: str, variable_tag="data-variable"):
-    """Extracts the field name from an svg file based on tag."""
+    """Extracts the field name from a svg file based on tag."""
     extracted_fields = []
     with open(svg_path) as svg:
         soup = BeautifulSoup(svg.read(), "xml")
@@ -21,7 +21,7 @@ def get_svg_fields_from_tags(svg_path: str, variable_tag="data-variable"):
 
 
 def get_svg_variables(svg_path: str) -> list:
-    """Extracts the field name from an svg file based on brackets."""
+    """Extracts the field name from a svg file based on brackets."""
     with open(svg_path) as svg_file:
         env = Environment()
         template_str = svg_file.read()

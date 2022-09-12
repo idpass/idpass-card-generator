@@ -4,6 +4,7 @@ import os
 import shutil
 import tempfile
 import uuid
+from time import time
 
 from bs4 import BeautifulSoup, Tag
 from jinja2 import Template
@@ -24,8 +25,8 @@ class CardRender:
         """
         Render template card with real data
         :arg card: Card model instance
-        :arg data: Dict of data that will be supplied to the template card.
-        :arg create_qr_code: Bool to check if qrcode should be generated.
+        :arg data: Dict of data that will be supplied to the template card
+        :arg create_qr_code: Bool to check if qrcode should be generated
         """
         self.temp_dir = tempfile.mkdtemp(suffix="card-temp-files")
         self.card = card
@@ -36,6 +37,8 @@ class CardRender:
         self.create_qr_code = create_qr_code
 
     def render(self):
+        start_render = time()
+        log.info(f"Start rendering #{str(self.card.uuid)}")
         self.create_svg()
         try:
             name = uuid.uuid4().hex
@@ -43,7 +46,7 @@ class CardRender:
             png_files = self.render_pngs(name)
         finally:
             shutil.rmtree(self.temp_dir)
-
+        log.info(f"End of rendering {time() - start_render}")
         return dict(pdf=pdf_name, png=png_files)
 
     def render_pngs(self, name: str) -> list:

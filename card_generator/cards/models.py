@@ -23,7 +23,7 @@ class Card(TimeStampedModel):
     def __str__(self):
         return self.title
 
-    def get_fields(self):
+    def get_fields(self) -> list:
         """Get available fields the user can update."""
         # This gets the fields tagged in `data-variable`
         front_svg_fields = get_svg_fields_from_tags(self.front_svg.path)
