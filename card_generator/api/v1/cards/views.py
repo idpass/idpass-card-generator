@@ -12,7 +12,7 @@ from card_generator.cards.models import Card
 @extend_schema_view(
     list=extend_schema(description="List all available card templates."),
     retrieve=extend_schema(description="Retrieve a card template."),
-    create=extend_schema(description="Createa a new card template."),
+    create=extend_schema(description="Create a new card template."),
     update=extend_schema(description="Update a card template."),
     delete=extend_schema(description="Remove a card template."),
 )
