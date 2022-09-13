@@ -6,68 +6,87 @@ Automate creating of multiple IDs, badges and cards for different people. Just u
 [![Built with Cookiecutter Django](https://img.shields.io/badge/built%20with-Cookiecutter%20Django-ff69b4.svg?logo=cookiecutter)](https://github.com/cookiecutter/cookiecutter-django/)
 [![Black code style](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 
-License: Apache 2.0
 
-## Settings
+### Getting Started
 
-Moved to [settings](http://cookiecutter-django.readthedocs.io/en/latest/settings.html).
+Clone this repo
+```shell
+git clone https://github.com/idpass/open-card-generator.git
+```
 
-## Setting Up Your Users
+*Requirements*
+- Docker engine or Docker Desktop
+- Docker compose
+  - It works with both v1 and v2
+  - For the sake of uniformity, we are using v2 in our examples
 
+###### Build
+```shell
+docker compose -f local.yml build
+```
+
+###### Run Services
+```shell
+docker compose -f local.yml up
+```
+
+### Creating a user
 -   To create a **superuser account**, use this command:
 
-        $ python manage.py createsuperuser
+```shell
+docker compose -f local.yml run --rm django python manage.py createsuperuser
+```
 
 -   To create a **normal account**, please login as a superuser in `/admin`
   - Create new account in `/admin/users/user/add/`
 - To access the card endpoints, you will need your authentication token for your authorization header
   - Get your access token in `api/v1/auth-token`
 
-## Using the CARD API
-This is the first version of the api, refer to this [documentation on its usage](card_generator/api/v1/cards/README.md).
-For the API specification, run the django application and visit [OPENAPI documentation](http://localhost:8000/api/docs).
+## Documentation
+Endpoints are documented using [OPENAPI specification](http://localhost:8000/api/docs). Visit this page to try and discover how this endpoints work.
 
-## Basic Commands
+For more in-depth explanation of card endpoints, please visit the [documentation on its usage](card_generator/api/v1/cards/README.md)
 
-### Local Setup
-To setup the local development environment, please refer to this [documentation](https://cookiecutter-django.readthedocs.io/en/latest/developing-locally.html).
+## Configuration
+For config settings, environment variables are stored in `.envs/`.
+Local values are already provided for quick setup of local environment.
 
-To setup using docker, please refer to this [documentation](https://cookiecutter-django.readthedocs.io/en/latest/developing-locally-docker.html).
+Django configuration settings are divided into different environments following 12 factor app principle. You will see that under `config/settings` we have `local`, `production`, `test` and the `base` config.
 
 
-### Type checks
+## Development
+Docker can help developers quickly set up the project environment with only a few commands. This project can be setup with or without Docker.
+- [Local setup without Docker](https://cookiecutter-django.readthedocs.io/en/latest/developing-locally.html)
+- [Local setup with Docker](https://cookiecutter-django.readthedocs.io/en/latest/developing-locally-docker.html)
+
+#### Type checks
 
 Running type checks with mypy:
+```shell
+mypy card_generator
+```
 
-    $ mypy card_generator
-
-### Test coverage
+#### Test coverage
 
 To run the tests, check your test coverage, and generate an HTML coverage report:
 
-    $ coverage run -m pytest
-    $ coverage html
-    $ open htmlcov/index.html
+```shell
+coverage run -m pytest
+coverage html
+open htmlcov/index.html
+```
 
 #### Running tests with pytest
-
-    $ pytest
-
-### Live reloading and Sass CSS compilation
-
-Moved to [Live reloading and SASS compilation](https://cookiecutter-django.readthedocs.io/en/latest/developing-locally.html#sass-compilation-live-reloading).
-
-### Sentry
-
-Sentry is an error logging aggregator service. You can sign up for a free account at <https://sentry.io/signup/?code=cookiecutter> or download and host it yourself.
-The system is set up with reasonable defaults, including 404 logging and integration with the WSGI application.
-
-You must set the DSN url in production.
+```shell
+pytest
+```
 
 ## Deployment
+This project expects you will have a production environment files located in `.envs/.production` with the same `.django` and `.postgres` files inside.
 
-The following details how to deploy this application.
 
-### Docker
+Deployment with Docker and Compose is easy and can be setup on any remote server.
+Follow [this instructions](https://cookiecutter-django.readthedocs.io/en/latest/deployment-with-docker.html) to deploy this project to a production server.
 
-See detailed [cookiecutter-django Docker documentation](http://cookiecutter-django.readthedocs.io/en/latest/deployment-with-docker.html).
+## License
+[APACHE 2.0](./LICENSE)
