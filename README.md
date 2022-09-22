@@ -3,7 +3,6 @@
 Automate creating of multiple IDs, badges and cards for different people. Just upload your template and start generating your cards with different information.
 
 
-[![Built with Cookiecutter Django](https://img.shields.io/badge/built%20with-Cookiecutter%20Django-ff69b4.svg?logo=cookiecutter)](https://github.com/cookiecutter/cookiecutter-django/)
 [![Black code style](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 
 
@@ -11,7 +10,7 @@ Automate creating of multiple IDs, badges and cards for different people. Just u
 
 Clone this repo
 ```shell
-git clone https://github.com/idpass/open-card-generator.git
+git clone https://github.com/idpass/idpass-card-generator.git
 ```
 
 *Requirements*
