@@ -88,4 +88,4 @@ Deployment with Docker and Compose is easy and can be setup on any remote server
 Follow [this instructions](https://cookiecutter-django.readthedocs.io/en/latest/deployment-with-docker.html) to deploy this project to a production server.
 
 ## License
-[APACHE 2.0](./LICENSE)
+[Apache 2.0](./LICENSE)
