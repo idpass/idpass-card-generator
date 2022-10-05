@@ -1,4 +1,4 @@
-ARG PYTHON_VERSION=3.9-slim-bullseye
+ARG PYTHON_VERSION=3.10-slim-buster
 
 
 
@@ -47,6 +47,8 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
   libpq-dev \
   # Translations dependencies
   gettext \
+  # Pdf generation
+  libxml2-dev libxslt-dev librsvg2-bin mupdf-tools \
   # cleaning up unused files
   && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
   && rm -rf /var/lib/apt/lists/*
@@ -69,6 +71,8 @@ COPY --chown=django:django ./compose/production/django/start /start
 RUN sed -i 's/\r$//g' /start
 RUN chmod +x /start
 
+COPY --chown=django:django ./card_generator/static/fonts/* /usr/share/fonts/
+RUN fc-cache -f -v
 
 # copy application code to WORKDIR
 COPY --chown=django:django . ${APP_HOME}

@@ -28,3 +28,6 @@ lxml>=4.5.1 # https://github.com/lxml/lxml
 
 # QR Code
 qrcode>=6.1 # https://github.com/lincolnloop/python-qrcode
+
+# Jinja
+Jinja2>=3.1.2  # https://github.com/pallets/jinja
