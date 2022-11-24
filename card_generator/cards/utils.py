@@ -1,8 +1,10 @@
 import base64
+import codecs
 import os
 import subprocess
 
 from bs4 import BeautifulSoup
+from django.utils.timezone import now
 from jinja2 import Environment, meta
 
 
@@ -64,3 +66,17 @@ def convert_file_to_uri(encoding, path):
     with open(path, "rb") as file:
         encoded = base64.b64encode(file.read()).decode("utf-8")
     return f"data:{encoding};base64,{encoded}"
+
+
+def data_uri_to_file(files: list, target_dir: str, file_format="pdf"):
+    file_names = []
+    for item in files:
+        if "data:application" in item:
+            _, base_64 = item.split(",")
+        else:
+            base_64 = item
+        file_name = f"{target_dir}/{now().timestamp()}.{file_format}"
+        with open(file_name, "wb") as f:
+            f.write(codecs.decode(base_64.encode("utf-8"), "base64"))
+        file_names.append(file_name)
+    return file_names
