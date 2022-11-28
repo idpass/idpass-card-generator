@@ -2,9 +2,9 @@ import base64
 import codecs
 import os
 import subprocess
+import uuid
 
 from bs4 import BeautifulSoup
-from django.utils.timezone import now
 from jinja2 import Environment, meta
 
 
@@ -75,7 +75,7 @@ def data_uri_to_file(files: list, target_dir: str, file_format="pdf"):
             _, base_64 = item.split(",")
         else:
             base_64 = item
-        file_name = f"{target_dir}/{now().timestamp()}.{file_format}"
+        file_name = f"{target_dir}/{uuid.uuid4()}.{file_format}"
         with open(file_name, "wb") as f:
             f.write(codecs.decode(base_64.encode("utf-8"), "base64"))
         file_names.append(file_name)
