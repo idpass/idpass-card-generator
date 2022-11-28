@@ -306,3 +306,13 @@ SPECTACULAR_SETTINGS = {
 }
 # Your stuff...
 # ------------------------------------------------------------------------------
+# OpenSPP
+OPENSPP_SERVER_ROOT = env.str("OPENSPP_SERVER_ROOT", default="http://localhost:8009")
+OPENSPP_USERNAME = env.str("OPENSPP_USERNAME", default="admin@newlogic.com")
+OPENSPP_API_TOKEN = env.str("OPENSPP_API_TOKEN", default="password")
+OPENSPP_DB_NAME = env.str("OPENSPP_DB_NAME", default="devel")
+OPENSPP_QUEUE_BATCH_MODEL = env.str(
+    "OPENSPP_CARDS_MODEL", default="spp.print.queue.batch"
+)
+OPENSPP_ID_QUEUE_MODEL = env.str("OPENSPP_CARDS_MODEL", default="spp.print.queue.id")
+OPENSPP_DEFAULT_FETCH_LIMIT = env.str("OPENSPP_DEFAULT_FETCH_LIMIT", default=10)
