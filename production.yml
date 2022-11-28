@@ -1,7 +1,7 @@
 version: '3'
 
 services:
-  django:
+  django: &django
     build:
       context: .
       dockerfile: ./compose/production/django/Dockerfile
@@ -13,3 +13,16 @@ services:
     command: /start
     ports:
       - "8000:8000"
+
+  celery:
+    <<: *django
+    image: celery-worker
+    depends_on:
+      - django
+      - redis
+    command: celery -A config.celery_app worker -l info -E
+    ports: []
+    volumes: []
+
+  redis:
+    image: redis
