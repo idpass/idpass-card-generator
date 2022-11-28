@@ -6,7 +6,7 @@ volumes:
   production_traefik: {}
 
 services:
-  django:
+  django: &django
     build:
       context: .
       dockerfile: ./compose/production/django/Dockerfile
@@ -46,3 +46,13 @@ services:
 
   redis:
     image: redis:6
+
+  celery:
+    <<: *django
+    image: celery-worker
+    depends_on:
+      - django
+      - redis
+    command: celery -A config.celery_app worker -l info -E
+    ports: []
+    volumes: []
