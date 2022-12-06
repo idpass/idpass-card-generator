@@ -302,23 +302,21 @@ class OpenSPPClient:
 
 
 class QueueCardsClient(OpenSPPClient):
-    def get_queue_batch(self, batch_id: int):
-        return self.call_api(
+    def get_queue_batch(self, batch_id: int) -> dict | None:
+        records = self.call_api(
             "fetch",
             model_name=settings.OPENSPP_QUEUE_BATCH_MODEL,
             query_params=[[["id", "=", batch_id]]],
-            result_params={"fields": ["queued_ids"]},
+            result_params={"fields": ["queued_ids", "name"]},
         )
+        if not records:
+            return
+        return records[0]
 
-    def get_id_queue_pdfs(self, batch_id: int):
-        record = self.get_queue_batch(batch_id=batch_id)
-
-        if not record:
-            logger.info(f"Batch ID {batch_id} has an empty record.")
-            return []
-        id_queue_ids = record[0].get("queued_ids", [])
+    def get_id_queue_pdfs(self, batch_record: dict):
+        id_queue_ids = batch_record.get("queued_ids", [])
         if not id_queue_ids:
-            logger.info(f"Batch ID {batch_id} don't have queue IDs.")
+            logger.info(f"Batch ID {batch_record.get('id')} don't have queue IDs.")
             return []
 
         return self.call_api(
