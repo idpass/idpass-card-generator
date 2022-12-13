@@ -60,7 +60,16 @@ def perform_merging(client: QueueCardsClient, batch_id: int):
 
 
 @shared_task(bind=True, max_retries=3)
-def merge_cards(self, batch_id: int):
+def merge_cards(self, batch_id: int) -> None:
+    """
+    Merge cards of a Batch Queue from OpenSPP server.
+    Process flow:
+        - get the batch record to capture the name and queue IDs
+        - get the PDFs of cards for each queue ID records
+        - merge the PDFs into 1 PDF
+        - push the merged PDF to Batch record's id_pdf field, update merge_status and add filename also
+    :arg batch_id: ID of Batch record
+    """
     try:
         client = QueueCardsClient(
             server_root=settings.OPENSPP_SERVER_ROOT,
