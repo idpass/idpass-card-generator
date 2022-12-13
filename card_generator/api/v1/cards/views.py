@@ -24,6 +24,9 @@ logger = logging.getLogger(__name__)
     delete=extend_schema(description="Remove a card template."),
 )
 class CardViewSet(ModelViewSet):
+    """
+    ViewSet for all card related actions.
+    """
 
     serializer_class = CardSerializer
     queryset = Card.objects.all()
@@ -57,6 +60,10 @@ class CardViewSet(ModelViewSet):
     )
     @action(methods=["post"], detail=True, url_path="openspp/merge-cards")
     def merge_cards(self, request, **kwargs):
+        """
+        This is a dedicated action for OpenSPP. It accepts a batch queue ID and will return a message. The actual
+        process of merging cards is done through a background process.
+        """
         batch_id = request.data.get("batch_id")
         if not batch_id:
             return Response(status=400, data={"message": "Missing 'batch_id'."})
