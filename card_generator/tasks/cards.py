@@ -11,7 +11,13 @@ from card_generator.cards.utils import convert_file_to_uri, data_uri_to_file
 logger = logging.getLogger(__name__)
 
 
-def get_pdfs(client: QueueCardsClient, batch_record: dict):
+def get_pdfs(client: QueueCardsClient, batch_record: dict) -> list:
+    """
+    Get the cards from OpenSPP
+    :param client: The client to use when communicating to OpenSPP API
+    :param batch_record: ID of Batch record
+    :return: List of PDFs to be merged
+    """
     if not batch_record:
         return []
 
@@ -21,12 +27,25 @@ def get_pdfs(client: QueueCardsClient, batch_record: dict):
 
 def save_pdf_to_openspp(
     client: QueueCardsClient, batch_id: int, pdf_uri: str, filename: str
-):
+) -> None:
+    """
+    Update OpenSPP with the merged PDF
+    :param client: The client to use when communicating to OpenSPP API
+    :param batch_id: ID of Batch record
+    :param pdf_uri: URI formatted PDF
+    :param filename: name of merged PDF
+    """
     data = {"id_pdf": pdf_uri, "merge_status": "merged", "id_pdf_filename": filename}
     client.update_queue_batch_record(batch_id=batch_id, data=data)
 
 
-def merge_pdf(list_of_pdf: list, target_dir: str):
+def merge_pdf(list_of_pdf: list, target_dir: str) -> str:
+    """
+    Merge the list of PDFs
+    :param list_of_pdf: Lists of PDFs to be merged
+    :param target_dir: Target directory where to save the merged PDF
+    :return: The file name of the merged PDF
+    """
     file_name = f"{target_dir}/result.pdf"
     with PdfMerger() as merger:
         for item in list_of_pdf:
@@ -36,7 +55,12 @@ def merge_pdf(list_of_pdf: list, target_dir: str):
     return file_name
 
 
-def perform_merging(client: QueueCardsClient, batch_id: int):
+def perform_merging(client: QueueCardsClient, batch_id: int) -> None:
+    """
+    Do the actual process of merging the cards.
+    :param client: The client to use when communicating to OpenSPP API
+    :param batch_id: ID of Batch record
+    """
     with tempfile.TemporaryDirectory() as temp_dir:
         batch_record = client.get_queue_batch(batch_id)
         if not batch_record:
@@ -68,7 +92,7 @@ def merge_cards(self, batch_id: int) -> None:
         - get the PDFs of cards for each queue ID records
         - merge the PDFs into 1 PDF
         - push the merged PDF to Batch record's id_pdf field, update merge_status and add filename also
-    :arg batch_id: ID of Batch record
+    :param batch_id: ID of Batch record
     """
     try:
         client = QueueCardsClient(
