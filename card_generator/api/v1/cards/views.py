@@ -42,7 +42,7 @@ class CardViewSet(ModelViewSet):
         """
         Generate a card from a template with the provided values.
         :param request: Request object
-        :param kwargs: Extra data to pass
+        :param kwargs: Unrequired keyword arguments that may be passed to this function
         :return: Response object with the data rendered.
         """
         serializer = CardRenderSerializer(
@@ -59,7 +59,7 @@ class CardViewSet(ModelViewSet):
         """
         List all variable fields present in the template where the user can provide a value.
         :param request: Request object
-        :param kwargs: Extra data to pass
+        :param kwargs: Unrequired keyword arguments that may be passed to this function
         :return: Response object with the list of fields
         """
         data = {"fields": self.get_object().get_fields()}
@@ -74,7 +74,7 @@ class CardViewSet(ModelViewSet):
         This is a dedicated action for OpenSPP. It accepts a batch queue ID and will return a message. The actual
         process of merging cards is done through a background process.
         :param request: Request object
-        :param kwargs: Extra data to pass
+        :param kwargs: Unrequired keyword arguments that may be passed to this function
         :return: Response object with a message
         """
         batch_id = request.data.get("batch_id")
