@@ -331,8 +331,12 @@ class CardDetailTestCase(APITestCase):
         with self.assertRaises(QRCodeCharLimitException):
             self.client.post(self.render_url, data, format="json")
 
+    @mock.patch("card_generator.cards.client.QueueCardsClient.get_queue_batch")
+    @mock.patch("card_generator.cards.client.QueueCardsClient.login")
     @mock.patch("card_generator.tasks.cards.merge_cards.delay")
-    def test_merge_cards(self, mock_task):
+    def test_merge_cards(self, mock_task, mock_login, mock_get_queue_batch):
+        mock_login.return_value = 1
+        mock_get_queue_batch.return_value = {"id": 1}
         data = {"batch_id": 1}
         response = self.client.post(self.merge_cards_url, data=data, format="json")
         self.assertEqual(200, response.status_code)

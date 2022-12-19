@@ -9,6 +9,7 @@ from card_generator.tasks.cards import perform_merging
 
 
 class TestMergeCardTask(OpenSPPClientTestMixin, TestCase):
+    @mock.patch("card_generator.cards.client.QueueCardsClient.login")
     @mock.patch(
         "card_generator.cards.client.QueueCardsClient.update_queue_batch_record"
     )
@@ -19,7 +20,9 @@ class TestMergeCardTask(OpenSPPClientTestMixin, TestCase):
         mock_get_queue_batch,
         mock_get_id_queue_pdfs,
         mock_update_queue_batch_record,
+        mock_login,
     ):
+        mock_login.return_value = 1
         mock_get_queue_batch.return_value = self.sample_queue_batch
         mock_get_id_queue_pdfs.return_value = [
             self.sample_id_queue,
@@ -34,10 +37,14 @@ class TestMergeCardTask(OpenSPPClientTestMixin, TestCase):
         )
         perform_merging(client, 1)
 
+    @mock.patch("card_generator.cards.client.QueueCardsClient.login")
     @mock.patch("card_generator.cards.client.logger")
     @mock.patch("card_generator.cards.client.QueueCardsClient.get_queue_batch")
-    def test_merge_card_no_id_queue(self, mock_get_queue_batch, mock_logger):
+    def test_merge_card_no_id_queue(
+        self, mock_get_queue_batch, mock_logger, mock_login
+    ):
         mock_get_queue_batch.return_value = {"name": "no_id_queue", "id": 1}
+        mock_login.return_value = 1
         client = QueueCardsClient(
             server_root=settings.OPENSPP_SERVER_ROOT,
             username=settings.OPENSPP_USERNAME,
@@ -47,10 +54,14 @@ class TestMergeCardTask(OpenSPPClientTestMixin, TestCase):
         perform_merging(client, 1)
         mock_logger.info.assert_called_with("Batch ID 1 don't have queue IDs.")
 
+    @mock.patch("card_generator.cards.client.QueueCardsClient.login")
     @mock.patch("card_generator.tasks.cards.logger")
     @mock.patch("card_generator.cards.client.QueueCardsClient.get_queue_batch")
-    def test_merge_card_no_queue_batch(self, mock_get_queue_batch, mock_logger):
+    def test_merge_card_no_queue_batch(
+        self, mock_get_queue_batch, mock_logger, mock_login
+    ):
         mock_get_queue_batch.return_value = None
+        mock_login.return_value = 1
         client = QueueCardsClient(
             server_root=settings.OPENSPP_SERVER_ROOT,
             username=settings.OPENSPP_USERNAME,
