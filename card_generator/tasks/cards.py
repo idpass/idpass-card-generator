@@ -3,6 +3,7 @@ import tempfile
 
 from celery import shared_task
 from django.conf import settings
+from django.utils.timezone import now
 from PyPDF2 import PdfMerger
 
 from card_generator.cards.client import QueueCardsClient
@@ -35,7 +36,12 @@ def save_pdf_to_openspp(
     :param pdf_uri: URI formatted PDF
     :param filename: name of merged PDF
     """
-    data = {"id_pdf": pdf_uri, "merge_status": "merged", "id_pdf_filename": filename}
+    data = {
+        "id_pdf": pdf_uri,
+        "merge_status": "merged",
+        "id_pdf_filename": filename,
+        "date_merged": now().date().isoformat(),
+    }
     client.update_queue_batch_record(batch_id=batch_id, data=data)
 
 
