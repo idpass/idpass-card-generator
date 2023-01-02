@@ -5,12 +5,11 @@ volumes:
   open_card_generator_local_postgres_data_backups: {}
 
 services:
-  django:
+  django: &django
     build:
       context: .
       dockerfile: ./compose/local/django/Dockerfile
     image: open_card_generator_local_django
-    container_name: open_card_generator_local_django
     platform: linux/x86_64
     depends_on:
       - postgres
@@ -28,7 +27,6 @@ services:
       context: .
       dockerfile: ./compose/production/postgres/Dockerfile
     image: open_card_generator_production_postgres
-    container_name: open_card_generator_local_postgres
     volumes:
       - open_card_generator_local_postgres_data:/var/lib/postgresql/data:Z
       - open_card_generator_local_postgres_data_backups:/backups:z
@@ -51,3 +49,16 @@ services:
     ports:
       - "9000:9000"
     command: /start-docs
+
+  celery:
+    <<: *django
+    image: celery-worker
+    depends_on:
+      - django
+      - redis
+    command: celery -A config.celery_app worker -l info -E
+    ports: []
+    volumes: []
+
+  redis:
+    image: redis
