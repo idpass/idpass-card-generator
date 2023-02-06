@@ -10,7 +10,6 @@ from card_generator.cards.utils import get_svg_fields_from_tags, get_svg_variabl
 
 
 class Card(TimeStampedModel):
-
     title = models.CharField(_("Title"), max_length=50)
     front_svg = models.FileField(
         upload_to="cards/", validators=[FileExtensionValidator(["svg"])]
