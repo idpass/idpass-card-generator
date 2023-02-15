@@ -1,7 +1,7 @@
 import base64
 import codecs
-import os
-import subprocess
+import os  # nosec
+import subprocess  # nosec
 import uuid
 
 from bs4 import BeautifulSoup
@@ -25,7 +25,7 @@ def get_svg_fields_from_tags(svg_path: str, variable_tag="data-variable"):
 def get_svg_variables(svg_path: str) -> list:
     """Extracts the field name from a svg file based on brackets."""
     with open(svg_path) as svg_file:
-        env = Environment()
+        env = Environment(autoescape=True)
         template_str = svg_file.read()
         parsed_content = env.parse(template_str)
         variables = list(meta.find_undeclared_variables(parsed_content))
@@ -45,7 +45,7 @@ def convert_svgs(svg_files: list, output_filename: str, output_format: str):
         raise ValueError("No SVG to render.")
 
     with open(os.devnull, "wb") as devnull:
-        subprocess.check_call(
+        subprocess.check_call(  # nosec
             [
                 "rsvg-convert",
                 "-f",

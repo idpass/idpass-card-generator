@@ -32,6 +32,9 @@ def create_qrcode_content(value, error_correction=qrcode.constants.ERROR_CORRECT
         img = qr.make_image()
     except qrcode.exceptions.DataOverflowError:
         raise QRCodeCharLimitException(_("QR code value exceed limit."))
+    except ValueError:
+        # Raising this error instead of DataOverflowError in version later than 6.1
+        raise QRCodeCharLimitException(_("QR code value exceed limit."))
     output = io.BytesIO()
     img.save(output, "PNG")
     contents = output.getvalue()
