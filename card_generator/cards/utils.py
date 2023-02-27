@@ -51,9 +51,9 @@ def convert_svgs(svg_files: list, output_filename: str, output_format: str):
                 "-f",
                 output_format,
                 "-d",
-                "300",
+                "72",
                 "-p",
-                "300",
+                "72",
                 "-o",
                 output_filename,
             ]

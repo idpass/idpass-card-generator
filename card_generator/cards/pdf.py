@@ -21,12 +21,15 @@ log = logging.getLogger(__name__)
 
 
 class CardRender:
-    def __init__(self, card: Card, data: dict, create_qr_code: bool):
+    def __init__(
+        self, card: Card, data: dict, create_qr_code: bool, front_only: bool = False
+    ):
         """
         Render template card with real data
         :arg card: Card model instance
         :arg data: Dict of data that will be supplied to the template card
         :arg create_qr_code: Bool to check if qrcode should be generated
+        :arg front_only: Allow user to generate the front of card only
         """
         self.temp_dir = tempfile.mkdtemp(suffix="card-temp-files")
         self.card = card
@@ -35,6 +38,7 @@ class CardRender:
         self.svg_files = list()
         self.data = data
         self.create_qr_code = create_qr_code
+        self.front_only = front_only
 
     def render(self):
         start_render = time()
@@ -75,9 +79,11 @@ class CardRender:
     def create_svg(self):
         """Create new svg with the applied data."""
         front_soup = self.apply_data(self.front_svg_path, self.data)
-        back_soup = self.apply_data(self.back_svg_path, self.data)
         self.save_svg(front_soup)
-        self.save_svg(back_soup)
+
+        if not self.front_only:
+            back_soup = self.apply_data(self.back_svg_path, self.data)
+            self.save_svg(back_soup)
 
     def save_svg(self, content):
         svg_file = os.path.join(self.temp_dir, f"{uuid.uuid4().hex}.svg")

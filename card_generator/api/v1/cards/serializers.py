@@ -47,7 +47,10 @@ class CardRenderSerializer(serializers.Serializer):
 
     def get_files(self, obj):
         card = self.context["card"]
-        card_render = CardRender(card, obj["fields"], obj["create_qr_code"])
+        front_only = self.context.get("front_only", False)
+        card_render = CardRender(
+            card, obj["fields"], obj["create_qr_code"], front_only=front_only
+        )
         return card_render.render()
 
     def validate(self, data):

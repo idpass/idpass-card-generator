@@ -45,8 +45,10 @@ class CardViewSet(ModelViewSet):
         :param kwargs: Unrequired keyword arguments that may be passed to this function
         :return: Response object with the data rendered.
         """
+        front_only = self.request.query_params.get("front_only")
         serializer = CardRenderSerializer(
-            data=request.data, context={"card": self.get_object()}
+            data=request.data,
+            context={"card": self.get_object(), "front_only": front_only},
         )
         serializer.is_valid(raise_exception=True)
         return Response(data=serializer.data)
