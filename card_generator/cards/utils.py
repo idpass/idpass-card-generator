@@ -5,6 +5,7 @@ import subprocess  # nosec
 import uuid
 
 from bs4 import BeautifulSoup
+from django.conf import settings
 from jinja2 import Environment, meta
 
 
@@ -51,9 +52,9 @@ def convert_svgs(svg_files: list, output_filename: str, output_format: str):
                 "-f",
                 output_format,
                 "-d",
-                "72",
+                settings.OPENSPP_DEFAULT_CARD_X_DPI,
                 "-p",
-                "72",
+                settings.OPENSPP_DEFAULT_CARD_Y_DPI,
                 "-o",
                 output_filename,
             ]
