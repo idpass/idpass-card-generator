@@ -1,12 +1,12 @@
 import base64
 import codecs
-import os  # nosec
-import subprocess  # nosec
 import uuid
 
 from bs4 import BeautifulSoup
-from django.conf import settings
 from jinja2 import Environment, meta
+from PyPDF2 import PdfMerger
+from reportlab.graphics import renderPDF, renderPM
+from svglib.svglib import svg2rlg
 
 
 def get_svg_fields_from_tags(svg_path: str, variable_tag="data-variable"):
@@ -44,23 +44,27 @@ def convert_svgs(svg_files: list, output_filename: str, output_format: str):
     """Converts svg files to other format."""
     if not svg_files:
         raise ValueError("No SVG to render.")
+    if output_format == "pdf":
+        svg2pdf(svg_files, output_filename)
+    elif output_format == "png":
+        svg2png(svg_files, output_filename)
 
-    with open(os.devnull, "wb") as devnull:
-        subprocess.check_call(  # nosec
-            [
-                "rsvg-convert",
-                "-f",
-                output_format,
-                "-d",
-                settings.OPENSPP_DEFAULT_CARD_X_DPI,
-                "-p",
-                settings.OPENSPP_DEFAULT_CARD_Y_DPI,
-                "-o",
-                output_filename,
-            ]
-            + svg_files,
-            stdout=devnull,
-        )
+
+def svg2pdf(svg_files, output_filename):
+    svg_pdfs = []
+    for svg_file in svg_files:
+        drawing = svg2rlg(svg_file)
+        filename = f"{uuid.uuid4()}.pdf"
+        renderPDF.drawToFile(drawing, filename)
+        svg_pdfs.append(filename)
+    if svg_pdfs:
+        return merge_pdf(list_of_pdf=svg_pdfs, filename=output_filename)
+
+
+def svg2png(svg_files, output_filename):
+    for svg_file in svg_files:
+        drawing = svg2rlg(svg_file)
+        renderPM.drawToFile(drawing, output_filename, "PNG")
 
 
 def convert_file_to_uri(encoding, path):
@@ -81,3 +85,18 @@ def data_uri_to_file(files: list, target_dir: str, file_format="pdf"):
             f.write(codecs.decode(base_64.encode("utf-8"), "base64"))
         file_names.append(file_name)
     return file_names
+
+
+def merge_pdf(list_of_pdf: list, filename: str = "result.pdf") -> str:
+    """
+    Merge the list of PDFs
+    :param list_of_pdf: Lists of PDFs to be merged
+    :param filename: Name of file
+    :return: The complete path and file name of the merged PDF
+    """
+    with PdfMerger() as merger:
+        for item in list_of_pdf:
+            merger.append(item)
+        merger.write(filename)
+
+    return filename

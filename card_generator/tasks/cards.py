@@ -4,10 +4,9 @@ import tempfile
 from celery import shared_task
 from django.conf import settings
 from django.utils.timezone import now
-from PyPDF2 import PdfMerger
 
 from card_generator.cards.client import QueueCardsClient
-from card_generator.cards.utils import convert_file_to_uri, data_uri_to_file
+from card_generator.cards.utils import convert_file_to_uri, data_uri_to_file, merge_pdf
 
 logger = logging.getLogger(__name__)
 
@@ -45,22 +44,6 @@ def save_pdf_to_openspp(
     client.update_queue_batch_record(batch_id=batch_id, data=data)
 
 
-def merge_pdf(list_of_pdf: list, target_dir: str) -> str:
-    """
-    Merge the list of PDFs
-    :param list_of_pdf: Lists of PDFs to be merged
-    :param target_dir: Target directory where to save the merged PDF
-    :return: The file name of the merged PDF
-    """
-    file_name = f"{target_dir}/result.pdf"
-    with PdfMerger() as merger:
-        for item in list_of_pdf:
-            merger.append(item)
-        merger.write(file_name)
-
-    return file_name
-
-
 def perform_merging(client: QueueCardsClient, batch_id: int) -> None:
     """
     Do the actual process of merging the cards.
@@ -79,7 +62,7 @@ def perform_merging(client: QueueCardsClient, batch_id: int) -> None:
             return
         file_list = data_uri_to_file(list_of_files, temp_dir)
 
-        result_pdf = merge_pdf(file_list, temp_dir)
+        result_pdf = merge_pdf(file_list, f"{temp_dir}/result.pdf")
         _, base64_pdf = convert_file_to_uri("application/pdf", result_pdf).split(",")
         save_pdf_to_openspp(
             client=client,

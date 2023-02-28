@@ -37,3 +37,6 @@ PyPDF2==2.11.2
 
 # Jinja
 Jinja2>=3.1.2  # https://github.com/pallets/jinja
+
+# SVG Lib
+svglib==1.5.1
