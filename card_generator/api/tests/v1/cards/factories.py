@@ -7,7 +7,6 @@ fake = Faker()
 
 
 class CardFactory(factory.django.DjangoModelFactory):
-
     title = fake.text(20)
     front_svg = fake.file_name(category="image", extension="svg")
     back_svg = fake.file_name(category="image", extension="svg")

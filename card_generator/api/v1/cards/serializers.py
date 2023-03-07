@@ -18,7 +18,6 @@ class CustomFileField(serializers.FileField):
 
 
 class CardSerializer(serializers.ModelSerializer):
-
     front_svg = CustomFileField(validators=[FileExtensionValidator(["svg"])])
     back_svg = CustomFileField(validators=[FileExtensionValidator(["svg"])])
 

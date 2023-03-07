@@ -60,7 +60,7 @@ def test_merge(tmpdir_factory, merged_file_count: int, append_linesep: bool):
     with open(output_file_path) as output_file:
         actual_output_file_content = output_file.read()
 
-    assert actual_output_file_content == expected_output_file_content
+    assert actual_output_file_content == expected_output_file_content  # nosec
 
 
 if __name__ == "__main__":
