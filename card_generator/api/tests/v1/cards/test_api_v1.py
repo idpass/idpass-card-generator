@@ -1,6 +1,8 @@
 import base64
 from unittest import mock
+from urllib import request
 
+import PyPDF2
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -209,9 +211,15 @@ class CardDetailTestCase(APITestCase):
             f"{self.render_url}?front_only=true", data, format="json"
         )
         self.assertEqual(status.HTTP_200_OK, response.status_code)
-        self.assertTrue(response.data["files"]["pdf"])
+        base64_pdf = response.data["files"]["pdf"]
+        self.assertTrue(base64_pdf)
         self.assertTrue(response.data["files"]["png"])
         self.assertEqual(1, len(response.data["files"]["png"]))
+
+        with request.urlopen(base64_pdf) as response:
+            reader = PyPDF2.PdfFileReader(response)
+            total_pages = reader.numPages
+            self.assertEqual(1, total_pages)
 
     def test_anonymous_user_render_card(self):
         self.client.logout()
