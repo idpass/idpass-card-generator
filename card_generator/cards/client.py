@@ -1,4 +1,5 @@
 import logging
+import ssl
 import xmlrpc.client
 from typing import Any, Literal, Optional
 
@@ -33,7 +34,8 @@ class OpenSPPClient:
 
     @staticmethod
     def get_server_proxy(url):
-        return xmlrpc.client.ServerProxy(url)
+        context = ssl.SSLContext()
+        return xmlrpc.client.ServerProxy(url, context=context)
 
     def login(self, username, password, kwargs: Optional[dict] = None):
         if not kwargs:
