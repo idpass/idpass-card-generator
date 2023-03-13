@@ -1,6 +1,8 @@
 import base64
 from unittest import mock
+from urllib import request
 
+import PyPDF2
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -183,6 +185,41 @@ class CardDetailTestCase(APITestCase):
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertTrue(response.data["files"]["pdf"])
         self.assertTrue(response.data["files"]["png"])
+        self.assertEqual(2, len(response.data["files"]["png"]))
+
+    def test_card_front_only_render(self):
+        with open(FRONT_SVG_FILE, "rb") as svg_file:
+            sample_image_b64 = base64.b64encode(svg_file.read()).decode("utf-8")
+        sample_image = f"data:image/svg+xml;base64,{sample_image_b64}"
+        data = {
+            "create_qr_code": True,
+            "fields": {
+                "given_name": "Test User",
+                "identification_no": "idnum123",
+                "profile_svg_3": sample_image,
+                "sex": "M",
+                "date_of_birth": "Jan 1, 1990",
+                "date_of_expiry": "Jan 30, 2025",
+                "date_of_issue": "Jan 1, 2020",
+                "nationality": "Sample",
+                "surname": "Doe",
+                "qrcode_svg_15": "123182390178293712",
+            },
+        }
+
+        response = self.client.post(
+            f"{self.render_url}?front_only=true", data, format="json"
+        )
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        base64_pdf = response.data["files"]["pdf"]
+        self.assertTrue(base64_pdf)
+        self.assertTrue(response.data["files"]["png"])
+        self.assertEqual(1, len(response.data["files"]["png"]))
+
+        with request.urlopen(base64_pdf) as response:
+            reader = PyPDF2.PdfFileReader(response)
+            total_pages = reader.numPages
+            self.assertEqual(1, total_pages)
 
     def test_anonymous_user_render_card(self):
         self.client.logout()

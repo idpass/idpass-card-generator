@@ -1,5 +1,8 @@
 version: '3'
 
+volumes:
+  open_card_generator_prod_media: {}
+
 services:
   django: &django
     build:
@@ -13,6 +16,8 @@ services:
     command: /start
     ports:
       - "8000:8000"
+    volumes:
+      - open_card_generator_prod_media:/app/card_generator/media
 
   celery:
     <<: *django
