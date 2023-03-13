@@ -18,6 +18,8 @@ services:
       - "8000:8000"
     volumes:
       - open_card_generator_prod_media:/app/card_generator/media
+    extra_hosts:
+      - "${OPENSPP_HOSTNAME}:${OPENSPP_IP_ADDRESS}"
 
   celery:
     <<: *django
