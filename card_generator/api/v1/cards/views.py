@@ -1,6 +1,7 @@
 import logging
 
 from django.conf import settings
+from django.db import transaction
 from drf_spectacular.utils import OpenApiExample, extend_schema, extend_schema_view
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import action
@@ -38,6 +39,7 @@ class CardViewSet(ModelViewSet):
         methods=["post"],
         detail=True,
     )
+    @transaction.atomic
     def render(self, request, **kwargs):
         """
         Generate a card from a template with the provided values.
@@ -71,6 +73,7 @@ class CardViewSet(ModelViewSet):
         examples=[OpenApiExample(value={"batch_id": 1}, name="Sample request")],
     )
     @action(methods=["post"], detail=True, url_path="openspp/merge-cards")
+    @transaction.atomic
     def merge_cards(self, request, **kwargs):
         """
         This is a dedicated action for OpenSPP. It accepts a batch queue ID and will return a message. The actual
