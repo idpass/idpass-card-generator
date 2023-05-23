@@ -332,16 +332,10 @@ class QueueCardsClient(OpenSPPClient):
         )
 
     def update_queue_batch_record(self, batch_id: int, data: dict):
-        try:
-            response = self.call_api(
-                method_name="update",
-                model_name=settings.OPENSPP_QUEUE_BATCH_MODEL,
-                query_params=[[["id", "=", batch_id]]],
-                item_ids=[batch_id],
-                data=data,
-            )
-        except xmlrpc.client.Fault as e:
-            logger.info(f"Error in updating batch ID {batch_id}")
-            logger.info(e.faultString)
-            return
-        return response
+        return self.call_api(
+            method_name="update",
+            model_name=settings.OPENSPP_QUEUE_BATCH_MODEL,
+            query_params=[[["id", "=", batch_id]]],
+            item_ids=[batch_id],
+            data=data,
+        )

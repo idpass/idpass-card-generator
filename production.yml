@@ -30,6 +30,7 @@ services:
     command: celery -A config.celery_app worker -l info -E
     ports: []
     volumes: []
+    restart: always
 
   redis:
     image: redis
