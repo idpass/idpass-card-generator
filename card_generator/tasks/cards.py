@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 class OPENSPPCeleryTask(Task):
-    max_retries = 3
+    max_retries = settings.CELERY_MAX_RETRIES
 
     def on_failure(self, exc, task_id, args, kwargs, einfo):
         batch_id = args[1]["batch_id"]
@@ -142,7 +142,7 @@ def merge_cards(self, batch_id: int) -> None:
         )
     except Exception as e:  # noqa Lets catch all errors error for debugging and retry
         logger.info(f"Error raised on client. {str(e)}")
-        raise self.retry(exc=e, countdown=30)
+        raise self.retry(exc=e, countdown=settings.CELERY_RETRY_COUNTDOWN)
     try:
         perform_merging(client, batch_id)
     except (
@@ -151,5 +151,5 @@ def merge_cards(self, batch_id: int) -> None:
         Exception,
     ) as e:  # noqa Lets catch all errors error for debugging and retry
         logger.info(f"Error raised while performing merge. {str(e)}")
-        raise self.retry(countdown=30)
+        raise self.retry(countdown=settings.CELERY_RETRY_COUNTDOWN)
     logger.info(f"Batch #{batch_id} have been updated with merged cards.")
