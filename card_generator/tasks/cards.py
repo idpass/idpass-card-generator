@@ -1,7 +1,8 @@
 import logging
 import tempfile
+import xmlrpc.client
 
-from celery import shared_task
+from celery import Task, shared_task
 from django.conf import settings
 from django.utils.timezone import now
 from PyPDF2 import PdfMerger
@@ -10,6 +11,38 @@ from card_generator.cards.client import QueueCardsClient
 from card_generator.cards.utils import convert_file_to_uri, data_uri_to_file
 
 logger = logging.getLogger(__name__)
+
+
+class OPENSPPCeleryTask(Task):
+    max_retries = settings.CELERY_MAX_RETRIES
+
+    def on_failure(self, exc, task_id, args, kwargs, einfo):
+        batch_id = args[1]["batch_id"]
+        data = {"merge_status": "error_merging"}
+        try:
+            client = QueueCardsClient(
+                server_root=settings.OPENSPP_SERVER_ROOT,
+                username=settings.OPENSPP_USERNAME,
+                password=settings.OPENSPP_API_TOKEN,
+                db_name=settings.OPENSPP_DB_NAME,
+            )
+        except Exception as e:  # noqa Lets catch all errors error for debugging
+            logger.info(
+                f"Error raised on client while updating batch {batch_id} status to failed. {str(e)}"
+            )
+            return
+        try:
+            client.update_queue_batch_record(batch_id=batch_id, data=data)
+        except (
+            xmlrpc.client.ProtocolError,
+            xmlrpc.client.Fault,
+            Exception,
+        ) as e:  # noqa Lets catch all errors error for debugging
+            logger.info(
+                f"Error raised while updating batch {batch_id} failed status. {str(e)}"
+            )
+            return
+        logger.info(f"Batch #{batch_id} have been updated with failed status.")
 
 
 def get_pdfs(client: QueueCardsClient, batch_record: dict) -> list:
@@ -89,7 +122,7 @@ def perform_merging(client: QueueCardsClient, batch_id: int) -> None:
         )
 
 
-@shared_task(bind=True, max_retries=3)
+@shared_task(bind=True, base=OPENSPPCeleryTask)
 def merge_cards(self, batch_id: int) -> None:
     """
     Merge cards of a Batch Queue from OpenSPP server.
@@ -109,14 +142,14 @@ def merge_cards(self, batch_id: int) -> None:
         )
     except Exception as e:  # noqa Lets catch all errors error for debugging and retry
         logger.info(f"Error raised on client. {str(e)}")
-        self.retry(exc=e, countdown=30)
-        return
+        raise self.retry(exc=e, countdown=settings.CELERY_RETRY_COUNTDOWN)
     try:
         perform_merging(client, batch_id)
-    except Exception as e:  # noqa Lets catch all errors error for debugging and retry
+    except (
+        xmlrpc.client.ProtocolError,
+        xmlrpc.client.Fault,
+        Exception,
+    ) as e:  # noqa Lets catch all errors error for debugging and retry
         logger.info(f"Error raised while performing merge. {str(e)}")
-        data = {"merge_status": "error_merging"}
-        client.update_queue_batch_record(batch_id=batch_id, data=data)
-        self.retry(exc=e, countdown=30)
-        return
+        raise self.retry(countdown=settings.CELERY_RETRY_COUNTDOWN)
     logger.info(f"Batch #{batch_id} have been updated with merged cards.")

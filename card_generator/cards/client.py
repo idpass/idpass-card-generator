@@ -1,4 +1,5 @@
 import logging
+import ssl
 import xmlrpc.client
 from typing import Any, Literal, Optional
 
@@ -19,7 +20,7 @@ class OpenSPPClient:
     def __init__(self, server_root: str, username: str, password: str, db_name: str):
         """Initialize a OpenSPP client.
 
-        :param server_root: OpenSPP root url. E.g: https://dev.newlogic-demo.com/
+        :param server_root: OpenSPP root url. E.g: https://sample-server.com/
         :param username: User's username with access to the server
         :param password: User's password or API key with access to the server
         :param db_name: Name of database that contains the data for query
@@ -33,7 +34,11 @@ class OpenSPPClient:
 
     @staticmethod
     def get_server_proxy(url):
-        return xmlrpc.client.ServerProxy(url)
+        context = None
+        if settings.OPENSPP_CUSTOM_TLS:
+            context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+            context.load_verify_locations(settings.OPENSPP_CUSTOM_CERT_PATH)
+        return xmlrpc.client.ServerProxy(url, context=context)
 
     def login(self, username, password, kwargs: Optional[dict] = None):
         if not kwargs:
@@ -327,16 +332,10 @@ class QueueCardsClient(OpenSPPClient):
         )
 
     def update_queue_batch_record(self, batch_id: int, data: dict):
-        try:
-            response = self.call_api(
-                method_name="update",
-                model_name=settings.OPENSPP_QUEUE_BATCH_MODEL,
-                query_params=[[["id", "=", batch_id]]],
-                item_ids=[batch_id],
-                data=data,
-            )
-        except xmlrpc.client.Fault as e:
-            logger.info(f"Error in updating batch ID {batch_id}")
-            logger.info(e.faultString)
-            return
-        return response
+        return self.call_api(
+            method_name="update",
+            model_name=settings.OPENSPP_QUEUE_BATCH_MODEL,
+            query_params=[[["id", "=", batch_id]]],
+            item_ids=[batch_id],
+            data=data,
+        )
