@@ -1,6 +1,7 @@
 import logging
 
 from django.conf import settings
+from django.core.cache import cache
 from drf_spectacular.utils import OpenApiExample, extend_schema, extend_schema_view
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import action
@@ -33,6 +34,14 @@ class CardViewSet(ModelViewSet):
     lookup_field = "uuid"
     authentication_classes = (TokenAuthentication,)
     http_method_names = ("get", "post", "put", "delete")
+
+    def get_object(self):
+        card_data = cache.get("card_data")
+        if not card_data:
+            card_data = super().get_object()
+            cache.set("card_data", card_data, 600)
+
+        return card_data
 
     @action(
         methods=["post"],
